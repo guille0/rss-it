@@ -34,7 +34,7 @@ urlpatterns = [
     path('resize/<video_id>/', gui_views.Resize, name='resize'),
 
     # Gets the mp3 link from each video id
-    path('get/<video_id>/', getter_views.Getter, name='getter'),
+    path('get/<video_id>.m4a', getter_views.Getter, name='getter'),
 
     # Admin
     path('admin/', admin.site.urls),
