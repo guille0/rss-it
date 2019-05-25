@@ -9,11 +9,13 @@ def video_to_mp3(video_id):
     ydl_opts = {
         'quiet': True,
         'format': 'm4a',
+        # Try also 'aac'
         # 'prefer_ffmpeg': True,
         # 'ext': 'mp3'
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_id, download=False)
+        print(info['formats'][0]['ext'])
         # print(info)
     return info['formats'][0]['url']
 

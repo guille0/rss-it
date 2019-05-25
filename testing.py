@@ -17,9 +17,11 @@ def video_to_mp3(video_id):
         'format': 'm4a'
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        # info = ydl.extract_info(video_id, download=False)
-        ydl.download([video_id])
+        info = ydl.extract_info(video_id, download=False)
+        # ydl.download([video_id])
         # print(info)
+    
+    print(info)
     return 'hey'
     return info['formats'][0]['url'], info['formats'][0]['filesize']
 print('hey')
