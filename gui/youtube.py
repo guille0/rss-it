@@ -9,6 +9,7 @@ import os
 # import pprint
 # pp = pprint.PrettyPrinter(indent=2)
 
+# UNUSED
 def video_url(root, url):
     rest = reverse('getter', kwargs={'video_id': url})
 
@@ -201,7 +202,7 @@ class Playlist:
                    logo=root+self.thumbnail, description=self.description)
 
         for video in self.videos:
-            feed.add_video(link=video_url(root, video.id), title=video.title,
+            feed.add_video(video_id=video.id, title=video.title,
                            pubdate=time_to_pubdate(video.date), description=video.description)
 
         return feed.export()
