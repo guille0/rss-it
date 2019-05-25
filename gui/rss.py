@@ -17,7 +17,7 @@ class Rss:
         if logo:
             self.fg.logo(logo)
 
-    def add_video(self, link, length, title, pubdate, description=''):
+    def add_video(self, link, title, pubdate, description=''):
         fe = self.fg.add_entry()
         fe.id(link)
         fe.title(title)
