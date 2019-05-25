@@ -199,7 +199,7 @@ class Playlist:
 
     def to_rss(self, root):
         feed = Rss(title=self.title, link=self.link,
-                   logo=self.thumbnail, description=self.description)
+                   logo=root+self.thumbnail, description=self.description)
 
         for video in self.videos:
             feed.add_video(link=video_url(root, video.id), title=video.title,
