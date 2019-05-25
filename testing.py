@@ -11,22 +11,24 @@ import youtube_dl
 
 def video_to_mp3(video_id):
     # Gets video id and returns mp3 (youtube-dl)
-    
     ydl_opts = {
         'quiet': True,
-        'format': 'm4a'
+        'format': 'bestaudio/best',
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_id, download=False)
-        # ydl.download([video_id])
-        # print(info)
-    
+
     for form in info['formats']:
-        if form['ext'] in ['m4a', 'mp3', 'aac']:
+        if form['ext'] == 'mp3':
+            print(form['ext'], form['url'])
             return form['url']
     
-    print(info)
-    return 'hey'
-    return info['formats']
+    for form in info['formats']:
+        if form['ext'] == 'm4a':
+            print(form['ext'], form['url'])
+            return form['url']
+
+    print('error, could not find good audio file')
+    return 'sorrydidntwork'
 print('hey')
 print(video_to_mp3('KOSrUDjkTW0'))
