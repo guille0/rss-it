@@ -6,8 +6,8 @@ from django.shortcuts import reverse
 import os
 
 # Remove this
-# import pprint
-# pp = pprint.PrettyPrinter(indent=2)
+import pprint
+pp = pprint.PrettyPrinter(indent=2)
 
 
 def video_url(root, url):
@@ -17,19 +17,23 @@ def video_url(root, url):
 
 
 def channel_to_playlist(channel_id):
+    # returns playlist, title, thumbnail
     api = YoutubeAPI.instance()
 
     request = api.youtube.channels().list(
-        fields='items(contentDetails(relatedPlaylists(uploads)))',
-        part='contentDetails',
+        fields='items(snippet(title,thumbnails(medium(url))),contentDetails(relatedPlaylists(uploads)))',
+        part='contentDetails,snippet',
         id=channel_id,
     )
     response = request.execute()
+    playlist = response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+    title = response['items'][0]['snippet']['title']
+    thumbnail = response['items'][0]['snippet']['thumbnails']['medium']['url']
 
     # pp.pprint(response)
 
     if len(response['items']) > 0:
-        return response['items'][0]['contentDetails']['relatedPlaylists']['uploads']
+        return playlist, title, thumbnail
     else:
         return None
 
@@ -161,22 +165,31 @@ class SearchResult:
 
 
 class Playlist:
-    def __init__(self, playlist_id, max_results=100):
+    def __init__(self, playlist_id, root, max_results=100, title=None, thumbnail=None):
         data = get_playlist(playlist_id, max_results)
         # pp.pprint(data)
         self.valid = False
 
         if data is not None:
             items = data['items']
+            self.root = root
             if len(items) > 0:
-                self.title = data['title']
+                self.videos = [Video(guy) for guy in items]
+                if thumbnail is None:
+                    self.thumbnail = self.root+reverse('resize', kwargs={'video_id': self.videos[0].id})
+                else:
+                    self.thumbnail = thumbnail
+
+                if title is None:
+                    self.title = data['title']
+                else:
+                    self.title = title
+
                 self.description = data['description']
                 self.channel = data['channel']
                 self.link = data['link']
 
                 self.valid = True
-                self.videos = [Video(guy) for guy in items]
-                self.thumbnail = reverse('resize', kwargs={'video_id': self.videos[0].id})
 
     def __getitem__(self, i):
         return self.videos[i]
@@ -197,12 +210,12 @@ class Playlist:
         # Sorts videos by normal playlist order
         self.videos.sort(key=lambda x: x.position)
 
-    def to_rss(self, root):
+    def to_rss(self):
         feed = Rss(title=self.title, link=self.link,
-                   logo=root+self.thumbnail, description=self.description)
+                   logo=self.thumbnail, description=self.description)
 
         for video in self.videos:
-            feed.add_video(link=video_url(root, video.id), title=video.title,
+            feed.add_video(link=video_url(self.root, video.id), title=video.title,
                            pubdate=time_to_pubdate(video.date), description=video.description)
 
         return feed.export()
@@ -234,7 +247,6 @@ class FeedCreator:
     def __init__(self, request):
         self.request = request
 
-        # TODO deployment change the http:// if it already includes it?
         self.root = 'http://' + self.request.get_host()
 
     def search(self, keyword, max_results):
@@ -251,40 +263,41 @@ class FeedCreator:
         # Turns channel search into a feed
         youtube = YoutubeAPI.instance()
         results = youtube.search(keyword, 1)
-        # [pp.pprint(channel) for channel in channels]
+
         # Gets the first channel or first playlist
         plist = results[0].playlist()
-        playlist = Playlist(plist, max_results=max_results)
+        playlist = Playlist(plist, root=self.root, max_results=max_results)
         playlist.sort_by_date()
 
-        rss = playlist.to_rss(self.root)
+        rss = playlist.to_rss()
 
         return rss
 
     def playlist_id(self, playlist_id, max_results):
         # Turns playlist into a feed
-        playlist = Playlist(playlist_id, max_results=max_results)
+        playlist = Playlist(playlist_id, root=self.root, max_results=max_results)
 
         if playlist.valid is False:
             return None
         # playlist.sort_by_playlist_order()
 
-        rss = playlist.to_rss(self.root)
+        rss = playlist.to_rss()
 
         return rss
 
     def channel_id(self, channel_id, max_results):
         # Turns playlist into a feed
-        playlist_id = channel_to_playlist(channel_id)
+        playlist_id, title, thumbnail = channel_to_playlist(channel_id)
         # print(playlist_id)
 
         if playlist_id is None:
             return None
 
-        playlist = Playlist(playlist_id, max_results=max_results)
+        playlist = Playlist(playlist_id, root=self.root, max_results=max_results,
+                            title=title, thumbnail=thumbnail)
         # Channels are sorted by date
         playlist.sort_by_date()
 
-        rss = playlist.to_rss(self.root)
+        rss = playlist.to_rss()
 
         return rss
