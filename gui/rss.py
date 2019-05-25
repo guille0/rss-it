@@ -17,14 +17,14 @@ class Rss:
         if logo:
             self.fg.logo(logo)
 
-    def add_video(self, link, title, pubdate, description=''):
+    def add_video(self, link, length, title, pubdate, description=''):
         fe = self.fg.add_entry()
         fe.id(link)
         fe.title(title)
         # Get the first paragraph of the description?
         fe.description(description)
         fe.pubDate(pubdate)
-        fe.enclosure(link, 0, 'audio/mpeg')
+        fe.enclosure(url=link, type='audio/mpeg')
 
     def export(self):
         return self.fg.rss_str(pretty=True)

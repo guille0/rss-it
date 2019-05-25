@@ -9,7 +9,6 @@ import os
 # import pprint
 # pp = pprint.PrettyPrinter(indent=2)
 
-
 def video_url(root, url):
     rest = reverse('getter', kwargs={'video_id': url})
 
