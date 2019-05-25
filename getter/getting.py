@@ -8,15 +8,16 @@ def video_to_mp3(video_id):
     # Gets video id and returns mp3 (youtube-dl)
     ydl_opts = {
         'quiet': True,
-        'format': 'm4a',
-        # Try also 'aac'
-        # 'prefer_ffmpeg': True,
-        # 'ext': 'mp3'
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_id, download=False)
-        print(info['formats'][0]['ext'])
-        # print(info)
-    return info['formats'][0]['url']
+
+    for form in info['formats']:
+        # TODO make it so it prefers mp3 then m4a then aac then mp4?
+        if form['ext'] in ['m4a', 'mp3', 'aac']:
+            return form['url']
+
+    print('error, could not find good audio file')
+    return 'sorrydidntwork'
 
 # video_to_mp3('-R6l_UERq_Q')

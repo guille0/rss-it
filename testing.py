@@ -21,8 +21,12 @@ def video_to_mp3(video_id):
         # ydl.download([video_id])
         # print(info)
     
+    for form in info['formats']:
+        if form['ext'] in ['m4a', 'mp3', 'aac']:
+            return form['url']
+    
     print(info)
     return 'hey'
-    return info['formats'][0]['url'], info['formats'][0]['filesize']
+    return info['formats']
 print('hey')
 print(video_to_mp3('KOSrUDjkTW0'))
