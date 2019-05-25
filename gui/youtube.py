@@ -159,9 +159,9 @@ class SearchResult:
     # Returns the uploads playlist id of a channel
     def playlist(self):
         if self.kind == 'youtube#channel':
-            return channel_to_playlist(self.id)
+            return self.kind, channel_to_playlist(self.id)
         if self.kind == 'youtube#playlist':
-            return self.id
+            return self.kind, self.id
 
 
 class Playlist:
@@ -265,8 +265,17 @@ class FeedCreator:
         results = youtube.search(keyword, 1)
 
         # Gets the first channel or first playlist
-        plist = results[0].playlist()
-        playlist = Playlist(plist, root=self.root, max_results=max_results)
+        kind, plist = results[0].playlist()
+
+        if kind == 'youtube#channel':
+            playlist = Playlist(plist[0], root=self.root, max_results=max_results,
+                                title=plist[1], thumbnail=plist[2])
+        if kind == 'youtube#playlist':
+            playlist = Playlist(plist, root=self.root, max_results=max_results)
+
+        if playlist.valid is False:
+            return None
+
         playlist.sort_by_date()
 
         rss = playlist.to_rss()
