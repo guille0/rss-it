@@ -3,10 +3,11 @@ import googleapiclient.errors
 from .helpers import Singleton, time_to_pubdate, parse_time
 from .rss import Rss
 from django.shortcuts import reverse
+import os
 
 # Remove this
-import pprint
-pp = pprint.PrettyPrinter(indent=2)
+# import pprint
+# pp = pprint.PrettyPrinter(indent=2)
 
 
 def video_url(root, url):
@@ -106,6 +107,7 @@ class YoutubeAPI:
 
     def __init__(self):
         # TODO hide this
+        self.key = os.environ.get('YOUTUBE_API_KEY')
         self.key = 'AIzaSyCkIU2qa_ZmuvUJxH-B8nIlQyewthIvFT0'
 
         api_service_name = 'youtube'
