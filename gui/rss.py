@@ -25,7 +25,7 @@ class Rss:
         fe.description(description)
         fe.pubDate(pubdate)
         # change mp4 to mp3 if we get an mp3 file? TODO
-        fe.enclosure(link, '0', 'audio/x-m4a')
+        fe.enclosure(link, '0', 'audio/mp4')
 
     def export(self):
         return self.fg.rss_str(pretty=True)
