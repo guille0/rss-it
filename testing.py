@@ -32,5 +32,5 @@ def video_to_mp3(video_id):
 
     print('error, could not find good audio file')
     return 'sorrydidntwork'
-print('hey')
-print(video_to_mp3('KOSrUDjkTW0'))
+# print("http://traffic.libsyn.com/anjunabeats/ABGT326_LiveShow1204198377.m4a".endswith('.mp3'))
+print(video_to_mp3('eWiPEDGovNk'))

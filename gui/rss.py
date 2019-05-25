@@ -24,8 +24,15 @@ class Rss:
         # Get the first paragraph of the description?
         fe.description(description)
         fe.pubDate(pubdate)
-        # change mp4 to mp3 if we get an mp3 file? TODO
-        fe.enclosure(link, '0', 'audio/mp4')
+
+        mimetype = 'audio/mpeg'
+        if link.endswith('.m4a'):
+            mimetype = 'audio/mp4'
+        elif link.endswith('.mp3'):
+            mimetype = 'audio/mpeg'
+        # add more formats if needed (usually works with audio/mpeg by default)
+
+        fe.enclosure(link, '0', mimetype)
 
     def export(self):
         return self.fg.rss_str(pretty=True)
