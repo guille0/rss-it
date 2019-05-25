@@ -24,7 +24,8 @@ class Rss:
         # Get the first paragraph of the description?
         fe.description(description)
         fe.pubDate(pubdate)
-        fe.enclosure(link, '0', 'audio/mpeg')
+        # change mp4 to mp3 if we get an mp3 file? TODO
+        fe.enclosure(link, '0', 'audio/mp4')
 
     def export(self):
         return self.fg.rss_str(pretty=True)

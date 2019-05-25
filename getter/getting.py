@@ -14,12 +14,12 @@ def video_to_mp3(video_id):
         info = ydl.extract_info(video_id, download=False)
 
     for form in info['formats']:
-        if form['ext'] == 'mp3':
+        if form['ext'] == 'm4a':
             print(form['ext'], form['url'])
             return form['url']
-    
+
     for form in info['formats']:
-        if form['ext'] == 'm4a':
+        if form['ext'] == 'mp3':
             print(form['ext'], form['url'])
             return form['url']
 

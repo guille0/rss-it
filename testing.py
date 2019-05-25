@@ -18,6 +18,8 @@ def video_to_mp3(video_id):
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_id, download=False)
 
+    print(info['formats'])
+
     for form in info['formats']:
         if form['ext'] == 'mp3':
             print(form['ext'], form['url'])
