@@ -15,6 +15,8 @@ def video_to_mp3(video_id):
     ydl_opts = {
         'quiet': True,
         'format': 'bestaudio/best',
+        'prefer_ffmpeg': True,
+        'ext': 'mp3'
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         info = ydl.extract_info(video_id, download=False)

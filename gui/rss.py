@@ -24,7 +24,7 @@ class Rss:
         # Get the first paragraph of the description?
         fe.description(description)
         fe.pubDate(pubdate)
-        fe.enclosure(link, '9999999999', 'audio/mpeg')
+        fe.enclosure(link, '0', 'audio/mpeg')
 
     def export(self):
         return self.fg.rss_str(pretty=True)
