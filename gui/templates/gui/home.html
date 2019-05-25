@@ -1,0 +1,14 @@
+{% extends 'gui/base.html' %}
+{% block content %}
+
+    <form method='POST'>
+        {% csrf_token %}
+        Search for a YouTube channel or playlist:
+        <br><br>
+        <input class="search-box" type="text" name="value" value="" autofocus autocomplete="off">
+            <input class="search-button" type="submit" value="Search">
+        <br><br>
+        
+    </form>
+
+{% endblock content %}

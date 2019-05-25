@@ -1,0 +1,56 @@
+{% extends 'gui/base.html' %}
+{% block content %}
+{% load static %}
+
+    <h3>Search results:</h3>
+
+    {% if results %}
+    <div>
+    <ul>
+        {% for result in results %}
+        
+        <li>
+
+            {% if result.kind == 'youtube#channel' %}
+
+            <a class="list-item" style="display:block" href="{% url 'channel-id-feed' result.id %}">
+                    <img class="channel-thumbnail" src="{{result.smallthumbnail}}" alt="{{result.title}}'s thumbnail">
+
+                    <p class="author">Channel</p>
+                    <p class="title">{{ result.title }}</p>
+            </a>
+
+            <input class="copy-button" type="image" src="{% static 'gui/images/copy.png' %}" onclick="copyText('{{ root }}{% url 'channel-id-feed' result.id %}')"></input>
+            
+            {% elif result.kind == 'youtube#playlist' %}
+
+            <a class="list-item" style="display:block" href="{% url 'playlist-id-feed' result.id %}">
+                    <img class="playlist-thumbnail" src="{{result.smallthumbnail}}" alt="{{result.title}}'s thumbnail">
+
+                    <p class="author">Playlist by {{ result.channel }}</p>
+                    <p class="title">{{ result.title }}</p>
+            </a>
+
+            <input class="copy-button" type="image" src="{% static 'gui/images/copy.png' %}" onclick="copyText('{{ root }}{% url 'playlist-id-feed' result.id %}')"></input>
+
+            {% endif %}
+            
+        </li>
+
+        {% endfor %}
+
+    </ul>
+
+    {% else %}
+        No results found.
+    {% endif %}
+
+<script>
+function copyText(text){
+    navigator.clipboard.writeText(text)
+    /* Alert the copied text */
+    // alert("Copied to clipboard: " + text);
+} 
+</script>
+
+{% endblock content %}

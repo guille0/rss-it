@@ -1,0 +1,141 @@
+html {
+    margin:0;
+    padding:0;
+    font-size:62.5%;
+    font-family:"-apple-system", "BlinkMacSystemFont", "Helvetica Neue", "Roboto", sans-serif;
+    height:100%
+   }
+   body {
+    height:100%;
+    font-size:150%;
+    line-height:1.4;
+    color:#f9d094;
+    background-color: #2A2A2E;
+    /* background:#2e2a24; */
+    position:relative;
+    margin:0;
+    padding:0 30px
+   }
+
+h1, h2, h3 {
+    color: #f9d094;
+    margin: 18px 0 24px;
+    text-shadow: 1px 1px 10px rgba(0,0,0,0.25);
+}
+
+h1 {
+    font-size: 420%;
+    text-align: center;
+}
+
+li {
+    list-style-type: none;
+    padding: 10px;
+    overflow: auto;
+}
+
+/* Search results */
+ 
+ul {
+  list-style-type: none;
+  text-decoration: none;
+  /* #TODO change this to % for mobile? */
+  width: 80%;
+}
+li img {
+  float: left;
+  margin: 0 15px 0 0;
+}
+li:hover {
+  background: rgb(73, 70, 67);
+  /* cursor: pointer; */
+}
+
+.list-item {
+    outline: none;
+    text-decoration: none;
+}
+
+.copy-button {
+  outline: none;
+  margin-right: 8px !important;
+  margin-left: auto !important;
+  margin-top: 10px;
+  display: block !important;
+}
+.copy-button:active {
+  transform: translateY(4px);
+}
+
+.channel-thumbnail, .playlist-thumbnail {
+    border: 1px solid #2A2A2E;
+}
+.channel-thumbnail {
+    margin-top: 1px;
+    margin-bottom: 1px;
+    margin-left: 16px;
+    margin-right: 32px;
+}
+.playlist-thumbnail {
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-left: 0px;
+    margin-right: 16px;
+}
+
+.title, .author {
+    margin-top: 4px;
+    margin-bottom: 4px;
+    color: #f9d094;
+    text-decoration: none;
+    text-shadow: 1px 1px 10px rgba(0,0,0,0.25);
+}
+.author {
+    margin-top: 4px;
+    font-size: 75%;
+    color: #72634b;
+}
+
+/* Homepage */
+
+.mid {
+    clear: both;
+    margin: 0 auto;
+    width: 50%;
+}
+
+.search-box {
+    float: left;
+    width: 80%;
+    height: 32px;
+    line-height: 32px;
+    border: 1px solid #ddd;
+    font-size: 16px;
+
+    padding: 4px 10px;
+    border-radius: .2em;
+    -moz-border-radius: .2em;
+    -webkit-border-radius: .2em;
+    overflow-x: auto;
+    
+    background-color: #38383D;
+    color: rgba(249, 249, 250, 1);
+    border-color: rgba(138, 138, 138, 0.8);
+    box-shadow: 0 1px 4px 0 rgba(12, 12, 13, 0.2), 0 0 0 1px rgba(0, 0, 0, 0.25);
+}
+
+.search-button {
+    width: 100px;
+    height: 32px;
+    margin-left: 4px;
+    margin-top: 4px;
+    float: left;
+    border: 1px solid #ddd;
+    background: #ddd;
+
+    text-align: center;
+    border-radius: .2em;
+    -moz-border-radius: .2em;
+    -webkit-border-radius: .2em;
+    overflow-x: auto;
+}
