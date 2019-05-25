@@ -176,7 +176,7 @@ class Playlist:
 
                 self.valid = True
                 self.videos = [Video(guy) for guy in items]
-                self.thumbnail = 'http://127.0.0.1:8000/resize/' + self.videos[0].id
+                self.thumbnail = reverse('resize', kwargs={'video_id': self.videos[0].id})
 
     def __getitem__(self, i):
         return self.videos[i]
