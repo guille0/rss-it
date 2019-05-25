@@ -18,10 +18,10 @@ def video_to_mp3(video_id):
             print(form['ext'], form['url'])
             return form['url']
 
-    for form in info['formats']:
-        if form['ext'] == 'mp3':
-            print(form['ext'], form['url'])
-            return form['url']
+    # for form in info['formats']:
+    #     if form['ext'] == 'mp3':
+    #         print(form['ext'], form['url'])
+    #         return form['url']
 
     print('error, could not find good audio file')
     return 'sorrydidntwork'
