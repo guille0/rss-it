@@ -5,10 +5,6 @@ from .rss import Rss
 from django.shortcuts import reverse
 import os
 
-# Remove this
-import pprint
-pp = pprint.PrettyPrinter(indent=2)
-
 
 def video_url(root, url):
     rest = reverse('getter', kwargs={'video_id': url})
@@ -30,16 +26,15 @@ def channel_to_playlist(channel_id):
     title = response['items'][0]['snippet']['title']
     thumbnail = response['items'][0]['snippet']['thumbnails']['medium']['url']
 
-    # pp.pprint(response)
-
     if len(response['items']) > 0:
         return playlist, title, thumbnail
     else:
-        return None
+        return None, None, None
 
 
 def get_playlist(playlist_id, max_results=100):
-    # Get a result limit so we don't blow the quota with huge channels/playlists
+    'max_results=-1 gets all the videos in the playlist'
+    # Set a result limit so we don't blow the quota with huge channels/playlists
     api = YoutubeAPI.instance()
 
     data = {}
@@ -55,12 +50,11 @@ def get_playlist(playlist_id, max_results=100):
     if len(response['items']) == 0:
         return None
 
-    # pp.pprint(response)
     response = response['items'][0]
 
     data['title'] = response['snippet']['title']
     data['description'] = response['snippet']['description'] or data['title']
-    # self.thumbnail = response['snippet']['thumbnails']['medium']['url']
+    # data['thumbnail'] = response['snippet']['thumbnails']['medium']['url']
     data['channel'] = response['snippet']['channelTitle']
     data['link'] = 'https://www.youtube.com/playlist?list=' + playlist_id
 
@@ -75,7 +69,7 @@ def get_playlist(playlist_id, max_results=100):
 
     while todo > 0:
         results_per_query = todo if todo <= 50 else 50
-        # print(f'searching for {results_per_query} with token {nextpage}')
+
         request = api.youtube.playlistItems().list(
             fields='nextPageToken,items(snippet(title,position,resourceId,publishedAt,description))',
             part='snippet',
@@ -90,9 +84,9 @@ def get_playlist(playlist_id, max_results=100):
             # If there's a next page, go to it
             nextpage = response['nextPageToken']
             todo -= results_per_query
+
         except KeyError:
             # If there isn't, finish up
-            print('Last page found')
             todo = 0
 
     return data
@@ -102,7 +96,7 @@ def clean_description(description):
     description = ''.join(description).lstrip()
 
     # Gets first paragraph of the description
-    description = description.split('\n')[0]
+    # description = description.split('\n')[0]
     return description
 
 
@@ -110,9 +104,8 @@ def clean_description(description):
 class YoutubeAPI:
 
     def __init__(self):
-        # TODO hide this
+        # Change to actual key for DEBUG ging
         self.key = os.environ.get('YOUTUBE_API_KEY')
-        self.key = 'AIzaSyCkIU2qa_ZmuvUJxH-B8nIlQyewthIvFT0'
 
         api_service_name = 'youtube'
         api_version = 'v3'
@@ -130,8 +123,6 @@ class YoutubeAPI:
             q=keyword,
         )
         response = request.execute()
-
-        # pp.pprint(response)
 
         results = [SearchResult(guy) for guy in response['items']]
 
@@ -156,8 +147,8 @@ class SearchResult:
     def __repr__(self):
         return f'{self.title}'
 
-    # Returns the uploads playlist id of a channel
     def playlist(self):
+        'Returns the "channel uploads" playlist id of a channel'
         if self.kind == 'youtube#channel':
             return self.kind, channel_to_playlist(self.id)
         if self.kind == 'youtube#playlist':
@@ -167,14 +158,23 @@ class SearchResult:
 class Playlist:
     def __init__(self, playlist_id, root, max_results=100, title=None, thumbnail=None):
         data = get_playlist(playlist_id, max_results)
-        # pp.pprint(data)
+
+        self.root = root
         self.valid = False
 
-        if data is not None:
+        if data is None:
+            self.valid = False
+        else:
             items = data['items']
-            self.root = root
+
             if len(items) > 0:
+                self.valid = True
+
                 self.videos = [Video(guy) for guy in items]
+                self.channel = data['channel']
+                self.description = data['description']
+                self.link = data['link']
+
                 if thumbnail is None:
                     self.thumbnail = self.root+reverse('resize', kwargs={'video_id': self.videos[0].id})
                 else:
@@ -184,12 +184,6 @@ class Playlist:
                     self.title = data['title']
                 else:
                     self.title = title
-
-                self.description = data['description']
-                self.channel = data['channel']
-                self.link = data['link']
-
-                self.valid = True
 
     def __getitem__(self, i):
         return self.videos[i]
@@ -250,37 +244,12 @@ class FeedCreator:
         self.root = 'http://' + self.request.get_host()
 
     def search(self, keyword, max_results):
-        'Returns a "max_results" number of channels/playlists'
-        # Does not create a feed, just returns a list of search results
+        'Returns a "max_results" number of search results'
+
         youtube = YoutubeAPI.instance()
         results = youtube.search(keyword, max_results)
-        # [pp.pprint(channel) for channel in channels]
 
         return results
-
-    def search_first_result(self, keyword, max_results):
-        'Creates a feed out of the first channel it finds'
-        # Turns channel search into a feed
-        youtube = YoutubeAPI.instance()
-        results = youtube.search(keyword, 1)
-
-        # Gets the first channel or first playlist
-        kind, plist = results[0].playlist()
-
-        if kind == 'youtube#channel':
-            playlist = Playlist(plist[0], root=self.root, max_results=max_results,
-                                title=plist[1], thumbnail=plist[2])
-        if kind == 'youtube#playlist':
-            playlist = Playlist(plist, root=self.root, max_results=max_results)
-
-        if playlist.valid is False:
-            return None
-
-        playlist.sort_by_date()
-
-        rss = playlist.to_rss()
-
-        return rss
 
     def playlist_id(self, playlist_id, max_results):
         # Turns playlist into a feed
@@ -295,16 +264,43 @@ class FeedCreator:
         return rss
 
     def channel_id(self, channel_id, max_results):
-        # Turns playlist into a feed
+        # Turns channel into a feed
         playlist_id, title, thumbnail = channel_to_playlist(channel_id)
-        # print(playlist_id)
 
         if playlist_id is None:
             return None
 
         playlist = Playlist(playlist_id, root=self.root, max_results=max_results,
                             title=title, thumbnail=thumbnail)
-        # Channels are sorted by date
+
+        # Channels are always sorted by date
+        playlist.sort_by_date()
+
+        rss = playlist.to_rss()
+
+        return rss
+
+# Dumb stuff
+    def search_first_result(self, keyword, max_results):
+        'Creates a feed out of the first channel or playlist it finds'
+        youtube = YoutubeAPI.instance()
+        results = youtube.search(keyword, 1)
+
+        if len(results) < 1:
+            return None
+
+        # Gets the first channel or playlist
+        kind, plist = results[0].playlist()
+
+        if kind == 'youtube#channel':
+            playlist = Playlist(plist[0], root=self.root, max_results=max_results,
+                                title=plist[1], thumbnail=plist[2])
+        if kind == 'youtube#playlist':
+            playlist = Playlist(plist, root=self.root, max_results=max_results)
+
+        if playlist.valid is False:
+            return None
+
         playlist.sort_by_date()
 
         rss = playlist.to_rss()

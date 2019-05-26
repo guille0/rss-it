@@ -1,11 +1,12 @@
 from __future__ import unicode_literals
 import youtube_dl
 
-# App links to this, this gives a link to the mp3
+# Rss feed links every episode to this, this redirects to the audio file
 
 
 def video_to_mp3(video_id):
     # Gets video id and returns mp3 (youtube-dl)
+
     ydl_opts = {
         'quiet': True,
         'format': 'bestaudio/best',
@@ -21,7 +22,5 @@ def video_to_mp3(video_id):
         if form['ext'] == 'mp3':
             return form['url']
 
-    print('Could not find mp3/m4a audio file, sending webm')
+    print(f'Could not find mp3/m4a audio file for {video_id}, sending webm')
     return info['formats'][0]['url']
-
-# video_to_mp3('-R6l_UERq_Q')

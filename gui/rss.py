@@ -1,7 +1,5 @@
 from __future__ import unicode_literals
 from feedgen.feed import FeedGenerator
-from urllib import request
-# sudo pip3 install feedgen
 
 
 class Rss:
@@ -12,9 +10,8 @@ class Rss:
         self.fg.title(title)
         self.fg.description(description)
         self.fg.link(href=link, rel='alternate')
+        self.fg.generator('rss-it')
 
-        # Logo is squashed (should be square)
-        # Link to a page that returns a squared thumbnail? with top and bottom lines
         if logo:
             self.fg.logo(logo)
 
@@ -22,15 +19,12 @@ class Rss:
         fe = self.fg.add_entry()
         fe.id(link)
         fe.title(title)
-        # Get the first paragraph of the description?
         fe.description(description)
         fe.pubDate(pubdate)
 
         mimetype = 'audio/mpeg'
         if link.endswith('.m4a'):
             mimetype = 'audio/mp4'
-        elif link.endswith('.mp3'):
-            mimetype = 'audio/mpeg'
         # add more formats if needed (usually works with audio/mpeg by default)
 
         fe.enclosure(link, '0', mimetype)

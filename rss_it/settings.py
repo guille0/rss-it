@@ -20,17 +20,16 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY='t0z(052o2t_xl5j*^1ni@q#wlp0e+p+hgmrb8x9j3qj%i4mqn2'
-# SECRET_KEY = os.environ.get('SECRET_KEY')
+# SECRET_KEY = thekey
+SECRET_KEY = os.environ.get('SECRET_KEY_RSS_IT')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = bool(os.environ.get('DEBUG'))
-DEBUG = True
+# DEBUG = True
+DEBUG = os.environ.get('DEBUG_VALUE', False)
 
 ALLOWED_HOSTS = [
     'rss-it.herokuapp.com',
     '127.0.0.1']
-
 
 # Application definition
 

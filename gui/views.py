@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, HttpResponseRedirect
-from .youtube import FeedCreator, channel_to_playlist
+from django.http import HttpResponse
+from .youtube import FeedCreator
 from skimage import io as skio
 from PIL import Image
 import io
@@ -23,7 +23,6 @@ def Resize(request, video_id):
     # Download image in bytes, add ¿black? bars, serve it
     # https://i.ytimg.com/vi/QhR2VGia0-s/mqdefault.jpg
 
-    # Test: 
     url = 'https://i.ytimg.com/vi/' + video_id + '/mqdefault.jpg'
 
     baseimg = skio.imread(url)
@@ -104,12 +103,15 @@ def SearchFirstFeed(request, keyword):
     guy = FeedCreator(request)
     feed = guy.search_first_result(keyword, 200)
 
+    if feed is None:
+        return HttpResponse('No results found.')
+
     return HttpResponse(feed, content_type='text/xml')
 
 
 def TestFeed(request):
-    # Creates a test feed
+    # Creates a test feed (small 3 video playlist)
     guy = FeedCreator(request)
-    feed = guy.playlist_id('PL3XZNMGhpynMm0Ywj-rupAKwRryWzEQy-', 10)
+    feed = guy.playlist_id('PLVuQBUGB87-gomoG36CV4wMZCkGPGKw3p', 10)
 
     return HttpResponse(feed, content_type='text/xml')
